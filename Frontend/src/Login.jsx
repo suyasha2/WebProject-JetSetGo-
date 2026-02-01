@@ -1,5 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+
+// ===== ASSET IMPORTS =====
 import logo from "./assets/logo.png";
 
 const Login = () => {
@@ -21,12 +24,8 @@ const Login = () => {
       const data = await res.json();
 
       if (data.success) {
-        // Dashboard ma pathauna bhanda agadi data save gareko
         localStorage.setItem("user", data.user.fullName);
-        alert("Login successful!");
-        
-        // REDIRECTION: Aba dashboard ma janchha
-        navigate("/dashboard"); 
+        navigate("/dashboard");
       } else {
         alert(data.message);
       }
@@ -39,56 +38,95 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#EBF3FF] p-6">
-      <div className="bg-white p-10 rounded-[40px] shadow-2xl w-full max-w-[450px] flex flex-col items-center">
-        <div className="w-20 h-20 bg-[#DCE9FF] rounded-2xl flex items-center justify-center shadow-inner mb-6 overflow-hidden">
-          <img src={logo} alt="JetSetGo Logo" className="w-full h-full object-contain p-2" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#bae6fd] via-[#e0f2fe] to-[#f0f9ff] font-sans relative overflow-hidden">
+      
+      {/* Dynamic Background Glows */}
+      <div className="absolute top-[-15%] left-[-10%] w-[700px] h-[700px] bg-sky-300/30 rounded-full blur-[130px]"></div>
+      <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-blue-200/40 rounded-full blur-[100px]"></div>
+
+      <div className="w-full max-w-[1250px] flex flex-col lg:flex-row min-h-[750px] p-6 md:p-12 items-center z-10">
+        
+        {/* LEFT SIDE: BRANDING PANEL */}
+        <div className="w-full lg:w-1/2 p-4 md:p-12 flex flex-col justify-center">
+          <div className="space-y-7">
+            <div className="flex items-center gap-4">
+              <div className="bg-white p-2.5 rounded-2xl shadow-md border border-sky-100">
+                <img src={logo} alt="Logo" className="w-12 h-12 object-contain" />
+              </div>
+              <span className="text-3xl font-black tracking-tighter text-sky-600">JetSetGo</span>
+            </div>
+
+            <h1 className="text-6xl md:text-[85px] font-black leading-[0.9] tracking-tight text-slate-900">
+              Fast, Efficient <br /> 
+              <span className="text-sky-500">and Productive.</span>
+            </h1>
+
+            <p className="text-slate-600 text-xl font-medium max-w-md leading-relaxed opacity-90">
+              Manage your travel journey with JetSetGo. Access the best hotels and book your next adventure—all in one place.
+            </p>
+          </div>
         </div>
 
-        <h2 className="text-3xl font-black text-[#2D3748] mb-2 text-center">Login</h2>
-        <p className="text-gray-500 text-sm mb-8 text-center">Welcome back to JetSetGo</p>
-
-        <form onSubmit={handleSubmit} className="w-full space-y-5">
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-[#2563EB] uppercase tracking-wider ml-1">Email</label>
-            <input
-              type="email"
-              placeholder="suyasha64@gmail.com"
-              className="w-full p-4 bg-[#F0F5FF] rounded-2xl outline-none focus:ring-2 focus:ring-blue-400 transition-all text-gray-700"
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
-            />
-          </div>
-
-          <div className="space-y-1 relative">
-            <div className="flex justify-between items-center px-1">
-              <label className="text-[10px] font-bold text-[#2563EB] uppercase tracking-wider">Password</label>
-              <Link to="/forgot-password" intrinsic="true" className="text-[10px] font-bold text-[#2563EB] uppercase hover:underline">
-                Forgot?
-              </Link>
+        {/* RIGHT SIDE: LOGIN FORM (Premium White Card) */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center mt-12 lg:mt-0">
+          <div className="bg-white rounded-[55px] shadow-[0_30px_70px_-20px_rgba(14,165,233,0.15)] w-full max-w-[480px] p-10 md:p-16 border border-white">
+            
+            <div className="mb-12 text-center lg:text-left">
+              <h2 className="text-4xl font-black text-slate-800 mb-2">Sign In</h2>
+              <p className="text-slate-400 font-medium">Please enter your credentials</p>
             </div>
-            <input
-              type="password"
-              placeholder="••••••••"
-              className="w-full p-4 bg-[#F0F5FF] rounded-2xl outline-none focus:ring-2 focus:ring-blue-400 transition-all text-gray-700"
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              required
-            />
+
+            <form onSubmit={handleSubmit} className="space-y-7">
+              {/* Email Field */}
+              <div className="space-y-2.5">
+                <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="name@example.com"
+                  className="w-full px-7 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 focus:bg-white transition-all text-slate-700 font-medium placeholder:text-slate-300"
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                />
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-2.5">
+                <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Password</label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  className="w-full px-7 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 focus:bg-white transition-all text-slate-700 font-medium placeholder:text-slate-300"
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end pr-1">
+                 <Link to="/forgot-password" intrinsic="true" className="text-xs font-bold text-slate-400 hover:text-sky-500 transition">
+                    Forgot Password?
+                  </Link>
+              </div>
+
+              {/* Submit Button */}
+              <button 
+                type="submit"
+                disabled={loading}
+                className="w-full bg-sky-500 text-white py-4.5 rounded-2xl font-black text-lg shadow-xl shadow-sky-200/50 hover:bg-slate-900 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:bg-slate-200 mt-4"
+              >
+                {loading ? <Loader2 className="animate-spin" /> : (
+                  <>
+                    Sign In <ArrowRight size={20} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="mt-12 text-center">
+              <p className="text-slate-400 text-sm font-medium">
+                New here? <Link to="/register" className="text-sky-500 font-black hover:underline underline-offset-4 ml-1">Create Account</Link>
+              </p>
+            </div>
           </div>
-
-          <button 
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#2563EB] text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-[0.98] transition-all mt-4 disabled:bg-gray-400"
-          >
-            {loading ? "Processing..." : "Sign In"}
-          </button>
-        </form>
-
-        <div className="mt-8 text-center">
-          <p className="text-gray-500 text-sm font-medium">
-            New? <Link to="/register" className="text-[#2563EB] font-bold hover:underline">Register</Link>
-          </p>
         </div>
       </div>
     </div>
