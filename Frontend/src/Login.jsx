@@ -15,6 +15,7 @@ const Login = () => {
     setLoading(true);
 
     try {
+      // Backend Port 8000 ma run huna parcha
       const res = await fetch("http://localhost:8000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -24,14 +25,15 @@ const Login = () => {
       const data = await res.json();
 
       if (data.success) {
+        // User ko name local storage ma save garne Dashboard ma dekhauna
         localStorage.setItem("user", data.user.fullName);
         navigate("/dashboard");
       } else {
-        alert(data.message);
+        alert(data.message || "Invalid Credentials");
       }
     } catch (err) {
       console.error("Login Error:", err);
-      alert("Backend server is not working.");
+      alert("Backend server is not working. Terminal ma 'node server.js' run garnus.");
     } finally {
       setLoading(false);
     }
@@ -67,7 +69,7 @@ const Login = () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE: LOGIN FORM (Premium White Card) */}
+        {/* RIGHT SIDE: LOGIN FORM */}
         <div className="w-full lg:w-1/2 flex items-center justify-center mt-12 lg:mt-0">
           <div className="bg-white rounded-[55px] shadow-[0_30px_70px_-20px_rgba(14,165,233,0.15)] w-full max-w-[480px] p-10 md:p-16 border border-white">
             
@@ -80,25 +82,31 @@ const Login = () => {
               {/* Email Field */}
               <div className="space-y-2.5">
                 <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Email Address</label>
-                <input
-                  type="email"
-                  placeholder="name@example.com"
-                  className="w-full px-7 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 focus:bg-white transition-all text-slate-700 font-medium placeholder:text-slate-300"
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                />
+                <div className="relative">
+                   <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                   <input
+                    type="email"
+                    placeholder="name@example.com"
+                    className="w-full pl-16 pr-7 py-5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 focus:bg-white transition-all text-slate-700 font-medium"
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                  />
+                </div>
               </div>
 
               {/* Password Field */}
               <div className="space-y-2.5">
                 <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Password</label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full px-7 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 focus:bg-white transition-all text-slate-700 font-medium placeholder:text-slate-300"
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                />
+                <div className="relative">
+                  <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    className="w-full pl-16 pr-7 py-5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 focus:bg-white transition-all text-slate-700 font-medium"
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end pr-1">
@@ -111,11 +119,11 @@ const Login = () => {
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full bg-sky-500 text-white py-4.5 rounded-2xl font-black text-lg shadow-xl shadow-sky-200/50 hover:bg-slate-900 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:bg-slate-200 mt-4"
+                className="w-full bg-sky-500 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-sky-200/50 hover:bg-slate-900 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:bg-slate-200 mt-4"
               >
                 {loading ? <Loader2 className="animate-spin" /> : (
                   <>
-                    Sign In <ArrowRight size={20} />
+                    Sign In <ArrowRight size={22} />
                   </>
                 )}
               </button>
