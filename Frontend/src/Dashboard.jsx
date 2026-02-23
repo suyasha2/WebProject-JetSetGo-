@@ -2,180 +2,191 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Search, Star, MapPin, LayoutDashboard, 
-  Bell, BookmarkCheck, MessageSquare, LogOut, 
-  User, CheckCircle, Clock, Filter, Settings, Heart
+  BookmarkCheck, MessageSquare, LogOut, 
+  User, Heart, Settings as SettingsIcon, ShieldAlert, X
 } from 'lucide-react';
+
+import Settings from './components/Settings';
+import TravelServices from './TravelServices'; 
+import logo from "./assets/logo.png";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState('');
   const [activeTab, setActiveTab] = useState('explore');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showBookingAlert, setShowBookingAlert] = useState(false);
-  const [favorites, setFavorites] = useState([]);
+  
+  const [locations, setLocations] = useState([]); 
+  const [favorites, setFavorites] = useState([]); 
+  const [reviews, setReviews] = useState([]); 
+
+  // MODAL STATES
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedLoc, setSelectedLoc] = useState(null);
+  const [tempReview, setTempReview] = useState({ rating: 5, comment: "" });
+
+  const fetchData = async () => {
+    try {
+      const locRes = await fetch('http://localhost:8000/api/locations');
+      const lData = await locRes.json();
+      if (lData.success) setLocations(lData.data);
+
+      const revRes = await fetch('http://localhost:8000/api/reviews/all');
+      const rData = await revRes.json();
+      if (rData.success) setReviews(rData.data);
+
+      const user = localStorage.getItem("user");
+      const favRes = await fetch(`http://localhost:8000/api/favorites/${user}`);
+      const fData = await favRes.json();
+      if (fData.success) setFavorites(fData.data);
+    } catch (err) { console.error(err); }
+  };
 
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (!user) navigate("/login");
-    else setUserName(user);
+    else {
+      setUserName(user);
+      fetchData();
+    }
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
+  const toggleFavorite = async (id) => {
+    try {
+      const res = await fetch('http://localhost:8000/api/favorites/toggle', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: userName, locationId: id })
+      });
+      const result = await res.json();
+      if (result.success) {
+        setFavorites(prev => result.action === "added" ? [...prev, id] : prev.filter(f => f !== id));
+      }
+    } catch (err) { console.error(err); }
   };
 
-  const locations = [
-    { id: 1, name: "Mount Everest", location: "Solukhumbu", price: "1,50,000", rating: 4.9, tags: ["Adventure"] },
-    { id: 2, name: "Pokhara Lakeside", location: "Pokhara", price: "35,000", rating: 4.7, tags: ["Relax"] },
-    { id: 3, name: "Chitwan Jungle", location: "Chitwan", price: "28,000", rating: 4.6, tags: ["Wildlife"] },
-    { id: 4, name: "Pashupatinath", location: "Kathmandu", price: "5,000", rating: 4.8, tags: ["Spiritual"] },
-    { id: 5, name: "Lumbini Garden", location: "Rupandehi", price: "12,000", rating: 4.5, tags: ["Peace"] },
-  ];
-
-  const toggleFavorite = (id) => {
-    setFavorites(prev => 
-      prev.includes(id) ? prev.filter(favId => favId !== id) : [...prev, id]
-    );
+  const submitReview = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('http://localhost:8000/api/reviews/add', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          username: userName, 
+          rating: tempReview.rating, 
+          comment: tempReview.comment,
+          locationName: selectedLoc.name 
+        })
+      });
+      if ((await res.json()).success) {
+        setIsModalOpen(false);
+        setTempReview({ rating: 5, comment: "" });
+        fetchData(); // List update garna
+      }
+    } catch (err) { alert("Error saving review"); }
   };
 
-  const filteredLocations = locations.filter(l => 
-    l.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredExplore = locations.filter(l => 
+    l.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    l.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const favoriteLocations = locations.filter(l => favorites.includes(l.id));
-
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC]">
+    <div className="flex min-h-screen bg-[#F0F9FF]">
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col fixed h-full z-20">
-        <div className="p-6">
-          <div className="flex items-center gap-2 mb-10">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">J</div>
-            <span className="text-xl font-black text-slate-800 tracking-tight">JetSetGo</span>
+      <aside className="w-72 bg-gradient-to-b from-sky-600 to-blue-700 fixed h-full z-20 flex flex-col">
+        <div className="p-8">
+          <div className="flex items-center gap-3 mb-12">
+            <img src={logo} alt="Logo" className="w-8 h-8 bg-white p-1 rounded-lg" />
+            <span className="text-2xl font-black text-white uppercase italic tracking-tighter">JetSetGo</span>
           </div>
-
-          <nav className="space-y-2">
+          <nav className="space-y-3">
             <SidebarItem icon={<LayoutDashboard size={20}/>} label="Explore" active={activeTab === 'explore'} onClick={() => setActiveTab('explore')} />
             <SidebarItem icon={<BookmarkCheck size={20}/>} label="My Bookings" active={activeTab === 'bookings'} onClick={() => setActiveTab('bookings')} />
-            
-            {/* FAVORITES TAB */}
-            <SidebarItem 
-                icon={<Heart size={20} className={favorites.length > 0 ? "fill-red-500 text-red-500" : ""}/>} 
-                label="Favourites" 
-                active={activeTab === 'favorites'} 
-                onClick={() => setActiveTab('favorites')} 
-                badge={favorites.length > 0 ? favorites.length : null} 
-            />
-
-            <SidebarItem icon={<Bell size={20}/>} label="Notifications" active={activeTab === 'alerts'} onClick={() => setActiveTab('alerts')} badge="2" />
+            <SidebarItem icon={<Heart size={20}/>} label="Favourites" active={activeTab === 'favorites'} onClick={() => setActiveTab('favorites')} />
+            <SidebarItem icon={<ShieldAlert size={20}/>} label="Services" active={activeTab === 'services'} onClick={() => setActiveTab('services')} />
             <SidebarItem icon={<MessageSquare size={20}/>} label="My Reviews" active={activeTab === 'reviews'} onClick={() => setActiveTab('reviews')} />
-            <SidebarItem icon={<Settings size={20}/>} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+            <SidebarItem icon={<SettingsIcon size={20}/>} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
           </nav>
         </div>
-
-        <div className="mt-auto p-6 border-t border-slate-100">
-          <button onClick={handleLogout} className="flex items-center gap-3 text-slate-500 hover:text-red-600 transition-colors font-semibold">
-            <LogOut size={20} /> Logout
-          </button>
+        <div className="mt-auto p-8 border-t border-white/10">
+          <button onClick={() => {localStorage.clear(); navigate("/login");}} className="flex items-center gap-3 text-white font-black uppercase text-xs w-full hover:bg-white/10 p-4 rounded-2xl transition-all"><LogOut size={18} /> Logout</button>
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
-      <main className="flex-1 ml-64">
-        <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10">
+      <main className="flex-1 ml-72">
+        <header className="h-24 bg-white/70 backdrop-blur-md border-b border-sky-100 flex items-center justify-between px-10 sticky top-0 z-10">
           <div className="relative w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search destinations..." 
-              className="w-full bg-slate-50 border-none rounded-xl py-2 pl-10 focus:ring-2 focus:ring-blue-500 transition-all"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input type="text" placeholder="Search..." className="w-full bg-sky-50 border-none rounded-2xl py-3 pl-12 font-bold outline-none" value={searchQuery} onChange={(e)=>setSearchQuery(e.target.value)} />
           </div>
           <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm font-bold text-slate-800">{userName}</p>
-              <p className="text-xs text-slate-400">Premium Member</p>
-            </div>
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
-              <User size={20} />
-            </div>
+            <p className="text-sm font-black text-slate-800 uppercase tracking-tighter">{userName}</p>
+            <div className="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center text-white"><User size={20}/></div>
           </div>
         </header>
 
-        <div className="p-8">
-          <div className="mb-8">
-            <h2 className="text-2xl font-black text-slate-800">Welcome Back, {userName.split(' ')[0]}!</h2>
-            <p className="text-slate-500 text-sm">Find and book your next trip across Nepal.</p>
-          </div>
-
-          {/* EXPLORE VIEW */}
+        <div className="p-10">
           {activeTab === 'explore' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-slate-800 tracking-tight">Popular Destinations</h3>
-                <button className="flex items-center gap-2 text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg">
-                  <Filter size={16}/> Filter
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredLocations.map(loc => (
-                  <DestinationCard 
-                    key={loc.id} 
-                    loc={loc} 
-                    isFavorite={favorites.includes(loc.id)}
-                    onFavorite={() => toggleFavorite(loc.id)}
-                    onBook={() => { setShowBookingAlert(true); setTimeout(() => setShowBookingAlert(false), 3000); }}
-                  />
-                ))}
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+              {filteredExplore.map(loc => (
+                <DestinationCard 
+                  key={loc.id} 
+                  loc={loc} 
+                  isFavorite={favorites.includes(loc.id)} 
+                  onFavorite={() => toggleFavorite(loc.id)} 
+                  onRateClick={() => { setSelectedLoc(loc); setIsModalOpen(true); }}
+                />
+              ))}
             </div>
           )}
 
-          {/* FAVORITES VIEW */}
+          {activeTab === 'reviews' && (
+            <div className="max-w-4xl space-y-6">
+              <h2 className="text-2xl font-black uppercase mb-6">Recent <span className="text-sky-600">Travel Reviews</span></h2>
+              {reviews.map(rev => (
+                <div key={rev.id} className="bg-white p-8 rounded-[35px] border border-sky-50 shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="font-black text-slate-800 uppercase text-xs">{rev.username}</p>
+                    <div className="flex text-amber-400">
+                      {[...Array(5)].map((_, i) => <Star key={i} size={14} className={i < rev.rating ? "fill-current" : "text-slate-100"}/>)}
+                    </div>
+                  </div>
+                  <p className="text-sky-500 font-black text-sm mb-3 uppercase tracking-tighter">{rev.locationName}</p>
+                  <p className="text-slate-600 font-bold italic">"{rev.comment}"</p>
+                </div>
+              ))}
+            </div>
+          )}
+
           {activeTab === 'favorites' && (
-            <div>
-              <h3 className="text-xl font-bold text-slate-800 mb-6">Your Favourites</h3>
-              {favoriteLocations.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {favoriteLocations.map(loc => (
-                    <DestinationCard 
-                        key={loc.id} 
-                        loc={loc} 
-                        isFavorite={true}
-                        onFavorite={() => toggleFavorite(loc.id)}
-                        onBook={() => { setShowBookingAlert(true); setTimeout(() => setShowBookingAlert(false), 3000); }}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
-                    <Heart size={48} className="mx-auto text-slate-200 mb-4" />
-                    <p className="text-slate-500 font-medium">No favorites added yet.</p>
-                </div>
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+               {locations.filter(l => favorites.includes(l.id)).map(loc => (
+                 <DestinationCard key={loc.id} loc={loc} isFavorite={true} onFavorite={() => toggleFavorite(loc.id)} onRateClick={() => { setSelectedLoc(loc); setIsModalOpen(true); }} />
+               ))}
             </div>
           )}
 
-          {/* Other tabs remain as placeholders for your logic */}
-          {activeTab === 'alerts' && (
-            <div className="bg-white rounded-3xl p-8 border border-slate-100">
-              <h3 className="text-xl font-bold mb-6">Notifications</h3>
-              <p className="text-slate-500">No new alerts.</p>
-            </div>
-          )}
+          {activeTab === 'services' && <TravelServices />}
+          {activeTab === 'settings' && <Settings />}
         </div>
       </main>
 
-      {showBookingAlert && (
-        <div className="fixed bottom-10 right-10 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 z-50 animate-bounce">
-          <div className="bg-green-500 rounded-full p-1"><CheckCircle size={20}/></div>
-          <div>
-            <p className="font-bold">Processing Booking!</p>
-            <p className="text-xs text-slate-400">Check your email for details.</p>
+      {/* REVIEW POPUP MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-6">
+          <div className="bg-white w-full max-w-md rounded-[45px] p-10 relative">
+            <button onClick={() => setIsModalOpen(false)} className="absolute top-8 right-8 text-slate-400 hover:text-slate-900"><X size={24}/></button>
+            <h3 className="text-2xl font-black uppercase text-center mb-8">Rate <span className="text-sky-600">{selectedLoc?.name}</span></h3>
+            <form onSubmit={submitReview} className="space-y-6">
+              <div className="flex justify-center gap-2">
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <Star key={num} size={35} className={`cursor-pointer ${tempReview.rating >= num ? 'text-amber-400 fill-current' : 'text-slate-200'}`} onClick={() => setTempReview({...tempReview, rating: num})}/>
+                ))}
+              </div>
+              <textarea className="w-full bg-slate-50 border-none rounded-3xl p-5 font-bold outline-none min-h-[120px]" placeholder="Tell us about your experience..." value={tempReview.comment} onChange={(e) => setTempReview({...tempReview, comment: e.target.value})} required />
+              <button type="submit" className="w-full bg-slate-900 text-white p-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-600 transition-all">Submit Review</button>
+            </form>
           </div>
         </div>
       )}
@@ -183,71 +194,37 @@ const Dashboard = () => {
   );
 };
 
-// UPDATED DESTINATION CARD COMPONENT
-const DestinationCard = ({ loc, isFavorite, onFavorite, onBook }) => (
-    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden">
-        {/* Top Image Section */}
-        <div className="h-48 bg-slate-200 relative">
-            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-blue-600">
-                {loc.tags[0]}
-            </div>
-        </div>
-
-        {/* Content Section */}
-        <div className="p-6">
-            <div className="flex justify-between items-start mb-2">
-                <h4 className="text-lg font-bold text-slate-800">{loc.name}</h4>
-                {/* Heart and Review Side-by-Side */}
-                <div className="flex items-center gap-3">
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); onFavorite(); }}
-                        className={`transition-colors ${isFavorite ? 'text-red-500' : 'text-slate-300 hover:text-red-400'}`}
-                    >
-                        <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
-                    </button>
-                    <div className="flex items-center gap-1 text-amber-400 border-l border-slate-100 pl-3">
-                        <Star size={14} className="fill-current"/> 
-                        <span className="text-xs font-black text-slate-700">{loc.rating}</span>
-                    </div>
-                </div>
-            </div>
-            <p className="text-slate-400 text-sm flex items-center gap-1 mb-4">
-                <MapPin size={14}/> {loc.location}
-            </p>
-            <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                <span className="text-blue-600 font-black text-lg">Rs. {loc.price}</span>
-                <button 
-                    onClick={onBook}
-                    className="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-blue-600 transition-colors"
-                >
-                    Book Now
-                </button>
-            </div>
-        </div>
-    </div>
-);
-
-const SidebarItem = ({ icon, label, active, onClick, badge }) => (
-  <button 
-    onClick={onClick}
-    className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${active ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'text-slate-500 hover:bg-slate-50'}`}
-  >
-    <div className="flex items-center gap-3 font-bold text-sm">
-      {icon} {label}
-    </div>
-    {badge && <span className={`text-[10px] px-2 py-0.5 rounded-full ${active ? 'bg-white text-blue-600' : 'bg-red-500 text-white'}`}>{badge}</span>}
+const SidebarItem = ({ icon, label, active, onClick }) => (
+  <button onClick={onClick} className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all ${active ? 'bg-white text-sky-600 shadow-xl' : 'text-sky-100 hover:bg-white/10'}`}>
+    {icon} <span className="font-black text-[12px] uppercase tracking-widest">{label}</span>
   </button>
 );
 
-const NotificationItem = ({ title, desc, time }) => (
-  <div className="flex items-start gap-4 p-4 hover:bg-slate-50 rounded-2xl transition-all border-b border-slate-50">
-    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 shrink-0"><Bell size={18}/></div>
-    <div>
-      <h5 className="font-bold text-slate-800">{title}</h5>
-      <p className="text-sm text-slate-500">{desc}</p>
-      <span className="text-[10px] text-slate-400 mt-2 block uppercase font-bold">{time}</span>
+const DestinationCard = ({ loc, isFavorite, onFavorite, onRateClick }) => (
+    <div className="bg-white rounded-[40px] border border-sky-50 shadow-sm hover:shadow-xl transition-all overflow-hidden group">
+        <div className="h-56 overflow-hidden">
+            <img src={`http://localhost:8000/uploads/${loc.image}`} alt={loc.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+        </div>
+        <div className="p-8">
+            <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h4 className="text-xl font-black text-slate-900">{loc.name}</h4>
+                  <p className="text-slate-400 font-bold text-sm italic"><MapPin size={14} className="inline mr-1" /> {loc.location}</p>
+                </div>
+                <button onClick={(e) => { e.stopPropagation(); onFavorite(); }} className={`p-2.5 rounded-2xl border ${isFavorite ? 'text-red-500 bg-red-50' : 'text-slate-300'}`}>
+                  <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
+                </button>
+            </div>
+            <div className="flex items-center justify-between border-t pt-6">
+              <span className="text-sky-600 font-black text-xl">Rs. {loc.price}</span>
+              {/* RATING BOX CLICKABLE BANAKO */}
+              <div onClick={onRateClick} className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg cursor-pointer hover:bg-amber-100 transition-colors">
+                <Star size={14} className="text-amber-400 fill-current" />
+                <span className="text-xs font-black text-amber-600">{loc.rating}</span>
+              </div>
+            </div>
+        </div>
     </div>
-  </div>
 );
 
 export default Dashboard;
