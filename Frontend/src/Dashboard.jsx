@@ -81,7 +81,7 @@ const Dashboard = () => {
       if ((await res.json()).success) {
         setIsModalOpen(false);
         setTempReview({ rating: 5, comment: "" });
-        fetchData(); // List update garna
+        fetchData(); 
       }
     } catch (err) { alert("Error saving review"); }
   };
@@ -217,7 +217,7 @@ const DestinationCard = ({ loc, isFavorite, onFavorite, onRateClick }) => (
             </div>
             <div className="flex items-center justify-between border-t pt-6">
               <span className="text-sky-600 font-black text-xl">Rs. {loc.price}</span>
-              {/* RATING BOX CLICKABLE BANAKO */}
+              
               <div onClick={onRateClick} className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg cursor-pointer hover:bg-amber-100 transition-colors">
                 <Star size={14} className="text-amber-400 fill-current" />
                 <span className="text-xs font-black text-amber-600">{loc.rating}</span>
