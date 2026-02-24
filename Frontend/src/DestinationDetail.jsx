@@ -168,4 +168,52 @@ const DestinationDetail = () => {
                 </div>
               </div>
 
+              {/* HOTELS */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ml-1">
+                  <Hotel size={16} /> Selected Stays
+                </h4>
+                <div className="grid gap-3">
+                  {destination.hotels.map((hotel, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-5 border-2 border-slate-50 rounded-[25px] bg-slate-50/30">
+                      <p className="font-black text-slate-800">{hotel.name}</p>
+                      <span className="text-[10px] font-black bg-white px-3 py-1 rounded-full border border-sky-100 text-sky-600 uppercase italic shadow-sm">
+                        {hotel.rating}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
+              {/* INCLUSIONS */}
+              <div className="space-y-3">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Package Includes</h4>
+                <div className="grid grid-cols-1 gap-2">
+                  {destination.packages.map((pkg, index) => (
+                    <div key={index} className="flex items-center gap-3 font-bold text-slate-600 text-xs bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">
+                      <CheckCircle size={16} className="text-green-500"/> {pkg}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* PRICE & BUTTON */}
+              <div className="pt-8 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Total Package Price</p>
+                  <span className="text-3xl font-[1000] text-slate-900 leading-none">Rs. {destination.price}</span>
+                </div>
+                <button className="bg-slate-900 text-white px-8 py-5 rounded-2xl font-[1000] uppercase text-xs tracking-widest shadow-xl hover:bg-sky-600 transition-all">
+                  Confirm Booking
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DestinationDetail;
