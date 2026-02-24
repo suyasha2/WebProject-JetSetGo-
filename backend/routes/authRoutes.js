@@ -4,21 +4,21 @@ const nodemailer = require("nodemailer");
 const User = require("../models/User"); 
 const router = express.Router();
 
-// --- 1. REGISTER (Yo thapiyeko chha) ---
+//  1. REGISTER 
 router.post("/register", async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
-    // Email check garne
+    // Email 
     const existingUser = await User.findOne({ where: { email: email.trim() } });
     if (existingUser) {
       return res.status(400).json({ success: false, message: "Email already registered!" });
     }
 
-    // Password hash garne
+    // Password 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Naya user create garne
+    
     const newUser = await User.create({
       fullName: fullName,
       email: email.trim(),
