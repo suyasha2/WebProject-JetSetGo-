@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail, ArrowLeft, Loader2, KeyRound } from "lucide-react";
+import { Mail, ArrowLeft, Loader2, KeyRound, ArrowRight } from "lucide-react";
 
 // ===== ASSET IMPORTS =====
 import logo from "./assets/logo.png";
@@ -66,7 +66,7 @@ const ForgotPassword = () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE: FORM (Premium White Card) */}
+        {/* RIGHT SIDE: FORM */}
         <div className="w-full lg:w-1/2 flex items-center justify-center mt-12 lg:mt-0">
           <div className="bg-white rounded-[55px] shadow-[0_30px_70px_-20px_rgba(14,165,233,0.15)] w-full max-w-[480px] p-10 md:p-16 border border-white">
             
@@ -78,7 +78,6 @@ const ForgotPassword = () => {
               <p className="text-slate-400 font-medium">Enter your registered email address</p>
             </div>
 
-            {/* Success/Error Message */}
             {message.text && (
               <div className={`mb-8 p-5 rounded-2xl text-sm font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-2 ${
                 message.type === "success" 
@@ -91,7 +90,6 @@ const ForgotPassword = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-7">
-              {/* Email Field */}
               <div className="space-y-2.5">
                 <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Email Address</label>
                 <div className="relative group">
@@ -107,25 +105,28 @@ const ForgotPassword = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* UPDATED BUTTON: NO BLACK, SKY BLUE ONLY */}
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full bg-sky-500 text-white py-4.5 rounded-2xl font-black text-lg shadow-xl shadow-sky-200/50 hover:bg-slate-900 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:bg-slate-200 mt-2"
+                className="w-full bg-sky-500 text-white px-14 py-5 rounded-full font-black uppercase text-xs tracking-[0.3em] hover:bg-sky-600 transition-all shadow-xl shadow-sky-100 active:scale-95 flex items-center justify-center gap-4 group disabled:bg-slate-200 mt-2"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="animate-spin" size={22} />
-                    Sending Link...
+                    <Loader2 className="animate-spin" size={20} />
+                    Sending...
                   </>
                 ) : (
-                  "Send Reset Link"
+                  <>
+                    Send Reset Link
+                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  </>
                 )}
               </button>
             </form>
 
             <div className="mt-10 text-center">
-              <Link to="/login" className="inline-flex items-center gap-2 text-sky-600 font-black hover:text-slate-900 transition group underline-offset-8 hover:underline">
+              <Link to="/login" className="inline-flex items-center gap-2 text-sky-600 font-black hover:text-sky-400 transition group underline-offset-8 hover:underline">
                 <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
                 Back to Login
               </Link>
