@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Lock, Mail } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, ChevronRight } from 'lucide-react';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -20,7 +20,6 @@ const AdminLogin = () => {
   };
 
   return (
-    
     <div className="min-h-screen bg-[#F0F9FF] flex items-center justify-center p-6 font-sans">
       <div className="w-full max-w-md bg-white rounded-[40px] shadow-2xl p-10 border border-sky-100">
         
@@ -68,11 +67,13 @@ const AdminLogin = () => {
             </div>
           </div>
 
+          {/* UPDATED BUTTON STYLE */}
           <button 
             type="submit"
-            className="w-full bg-slate-900 text-white py-5 rounded-2xl font-[1000] uppercase text-xs tracking-[0.2em] shadow-xl hover:bg-sky-600 active:scale-95 transition-all mt-4"
+            className="w-full bg-sky-500 text-white px-14 py-5 rounded-full font-black uppercase text-xs tracking-[0.3em] hover:bg-sky-600 transition-all shadow-xl shadow-sky-100 active:scale-95 flex items-center justify-center gap-4 group mt-4"
           >
             Access Admin Panel
+            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </form>
 
