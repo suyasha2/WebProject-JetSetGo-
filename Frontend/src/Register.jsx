@@ -50,13 +50,13 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#bae6fd] via-[#e0f2fe] to-[#f0f9ff] font-sans relative overflow-hidden">
-      
+
       {/* Dynamic Background Glows */}
       <div className="absolute top-[-15%] left-[-10%] w-[700px] h-[700px] bg-sky-300/30 rounded-full blur-[130px]"></div>
       <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-blue-200/40 rounded-full blur-[100px]"></div>
 
       <div className="w-full max-w-[1250px] flex flex-col lg:flex-row min-h-[750px] p-6 md:p-12 items-center z-10">
-        
+
         {/* LEFT SIDE: BRANDING PANEL (Matched with Login) */}
         <div className="w-full lg:w-1/2 p-4 md:p-12 flex flex-col justify-center">
           <div className="space-y-7">
@@ -68,7 +68,7 @@ const Register = () => {
             </div>
 
             <h1 className="text-6xl md:text-[85px] font-black leading-[0.9] tracking-tight text-slate-900">
-              Join the <br /> 
+              Join the <br />
               <span className="text-sky-500">community.</span>
             </h1>
 
@@ -81,7 +81,7 @@ const Register = () => {
         {/* RIGHT SIDE: REGISTER FORM (Matched Width with Login) */}
         <div className="w-full lg:w-1/2 flex items-center justify-center mt-12 lg:mt-0">
           <div className="bg-white rounded-[55px] shadow-[0_30px_70px_-20px_rgba(14,165,233,0.15)] w-full max-w-[480px] p-10 md:p-14 border border-white">
-            
+
             <div className="mb-10 text-center lg:text-left">
               <h2 className="text-4xl font-black text-slate-800 mb-2">Create Account</h2>
               <p className="text-slate-400 font-medium">Join us to explore Nepal</p>
@@ -97,7 +97,7 @@ const Register = () => {
                     type="text"
                     placeholder="John Doe"
                     className="w-full pl-16 pr-7 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 focus:bg-white transition-all text-slate-700 font-medium"
-                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     required
                   />
                 </div>
@@ -112,7 +112,7 @@ const Register = () => {
                     type="email"
                     placeholder="name@gmail.com"
                     className="w-full pl-16 pr-7 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 focus:bg-white transition-all text-slate-700 font-medium"
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
                   />
                 </div>
@@ -126,7 +126,7 @@ const Register = () => {
                     type="password"
                     placeholder="••••"
                     className="w-full px-6 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-sky-400 transition-all text-slate-700 font-medium"
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                   />
                 </div>
@@ -136,21 +136,22 @@ const Register = () => {
                     type="password"
                     placeholder="••••"
                     className="w-full px-6 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-sky-400 transition-all text-slate-700 font-medium"
-                    onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     required
                   />
                 </div>
               </div>
 
               {/* Submit Button */}
-              <button 
+              <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-sky-500 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-sky-200/50 hover:bg-slate-900 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:bg-slate-200 mt-4"
+                className="w-full bg-sky-500 text-white px-14 py-5 rounded-full font-black uppercase text-xs tracking-[0.3em] hover:bg-sky-600 transition-all shadow-xl shadow-sky-100 active:scale-95 flex items-center justify-center gap-4 group disabled:bg-slate-200 mt-4"
               >
                 {loading ? <Loader2 className="animate-spin" /> : (
                   <>
-                    Create Account <ArrowRight size={22} />
+                    Create Account
+                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                   </>
                 )}
               </button>
