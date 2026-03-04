@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Notification = require('../models/Notification'); 
 
-// 1. Get all notifications 
-router.get('/', async (req, res) => {
+// Get Notifications by Username
+router.get('/:username', async (req, res) => {
     try {
+        const { username } = req.params;
         const data = await Notification.findAll({
+            where: { username: username.trim() },
             order: [['createdAt', 'DESC']]
         });
         res.json({ success: true, data });
@@ -14,16 +16,14 @@ router.get('/', async (req, res) => {
     }
 });
 
-// 2. Clear all notifications
-router.delete('/clear', async (req, res) => {
+// Clear Notifications by Username
+router.delete('/clear/:username', async (req, res) => {
     try {
-        await Notification.destroy({
-            where: {},
-            truncate: true 
-        });
-        res.status(200).json({ success: true, message: "All notifications cleared" });
+        const { username } = req.params;
+        await Notification.destroy({ where: { username: username } });
+        res.json({ success: true, message: "Cleared" });
     } catch (err) {
-        res.status(500).json({ success: false, message: "Error clearing data" });
+        res.status(500).json({ success: false, message: "Error" });
     }
 });
 
