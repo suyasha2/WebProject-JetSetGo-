@@ -4,11 +4,6 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize");
 
-// =====================================
-// SPECIFIC ROUTES FIRST - PUT THESE AT THE TOP
-// =====================================
-
-// Get all users (for admin panel) - THIS MUST COME FIRST
 router.get("/all", async (req, res) => {
   try {
     console.log("✅ GET /all route hit!"); // Add this for debugging
@@ -284,11 +279,6 @@ router.put("/update-password/by-username/:username", async (req, res) => {
   }
 });
 
-// =====================================
-// GENERIC ROUTE - THIS MUST BE LAST
-// =====================================
-
-// Get user by ID - THIS MUST BE LAST
 router.get("/:id", async (req, res) => {
   try {
     console.log("📋 GET /:id route hit with ID:", req.params.id);

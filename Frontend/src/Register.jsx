@@ -42,7 +42,7 @@ const Register = () => {
       }
     } catch (err) {
       console.error("Register Error:", err);
-      alert("Backend server is not working. Terminal ma 'node server.js' run garnus.");
+      alert("Backend server is not working. .");
     } finally {
       setLoading(false);
     }
