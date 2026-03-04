@@ -15,7 +15,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // Backend Port 8000 
+      // Step 1: Login
       const res = await fetch("http://localhost:8000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -23,17 +23,43 @@ const Login = () => {
       });
 
       const data = await res.json();
+      console.log("Login response:", data);
 
       if (data.success) {
-        
+        // Store basic user info
         localStorage.setItem("user", data.user.fullName);
+        localStorage.setItem("userEmail", data.user.email);
+        
+        // Step 2: Fetch user ID using email
+        try {
+          // You need to create this endpoint or use an existing one
+          const userRes = await fetch(`http://localhost:8000/api/users/by-email/${encodeURIComponent(data.user.email)}`);
+          
+          if (userRes.ok) {
+            const userData = await userRes.json();
+            if (userData.success && userData.user.id) {
+              localStorage.setItem("userId", userData.user.id.toString());
+              console.log("Fetched and stored userId:", userData.user.id);
+            } else {
+              console.error("Could not fetch user ID");
+            }
+          } else {
+            console.error("Failed to fetch user data");
+          }
+        } catch (err) {
+          console.error("Error fetching user ID:", err);
+        }
+        
+        // Verify storage
+        console.log("Verification - userId in localStorage:", localStorage.getItem("userId"));
+        
         navigate("/dashboard");
       } else {
         alert(data.message || "Invalid Credentials");
       }
     } catch (err) {
       console.error("Login Error:", err);
-      alert("Backend server is not working. Terminal ma 'node server.js' run garnus.");
+      alert("Backend server is not working.");
     } finally {
       setLoading(false);
     }
@@ -88,6 +114,7 @@ const Login = () => {
                     type="email"
                     placeholder="name@example.com"
                     className="w-full pl-16 pr-7 py-5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 focus:bg-white transition-all text-slate-700 font-medium"
+                    value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
                   />
@@ -103,6 +130,7 @@ const Login = () => {
                     type="password"
                     placeholder="••••••••"
                     className="w-full pl-16 pr-7 py-5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 focus:bg-white transition-all text-slate-700 font-medium"
+                    value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                   />
@@ -110,7 +138,7 @@ const Login = () => {
               </div>
 
               <div className="flex justify-end pr-1">
-                <Link to="/forgot-password" intrinsic="true" className="text-xs font-bold text-slate-400 hover:text-sky-500 transition">
+                <Link to="/forgot-password" className="text-xs font-bold text-slate-400 hover:text-sky-500 transition">
                   Forgot Password?
                 </Link>
               </div>
