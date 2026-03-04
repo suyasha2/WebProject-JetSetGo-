@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Lock, Loader2, ArrowLeft, ShieldCheck } from "lucide-react";
-
-// ===== ASSET IMPORTS =====
+import { Lock, Loader2, ArrowLeft, ShieldCheck, CheckCircle2 } from "lucide-react";
 import logo from "./assets/logo.png";
 
 const ResetPassword = () => {
@@ -67,7 +65,7 @@ const ResetPassword = () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE: FORM (Premium Card) */}
+        {/* RIGHT SIDE: FORM */}
         <div className="w-full lg:w-1/2 flex items-center justify-center mt-12 lg:mt-0">
           <div className="bg-white rounded-[55px] shadow-[0_30px_70px_-20px_rgba(14,165,233,0.15)] w-full max-w-[480px] p-10 md:p-16 border border-white">
             
@@ -79,7 +77,6 @@ const ResetPassword = () => {
               <p className="text-slate-400 font-medium">Set a strong new password</p>
             </div>
 
-            {/* Error Message */}
             {message.text && (
               <div className="mb-6 p-4 rounded-2xl text-sm font-bold bg-red-50 text-red-600 border border-red-100 flex items-center gap-2">
                 <div className="w-2 h-2 bg-red-500 rounded-full"></div>
@@ -88,7 +85,6 @@ const ResetPassword = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-7">
-              {/* New Password */}
               <div className="space-y-2.5">
                 <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">New Password</label>
                 <div className="relative group">
@@ -104,7 +100,6 @@ const ResetPassword = () => {
                 </div>
               </div>
 
-              {/* Confirm Password */}
               <div className="space-y-2.5">
                 <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Confirm New Password</label>
                 <div className="relative group">
@@ -120,18 +115,25 @@ const ResetPassword = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
+              
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full bg-sky-500 text-white py-4.5 rounded-2xl font-black text-lg shadow-xl shadow-sky-200/50 hover:bg-slate-900 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:bg-slate-200 mt-2"
+                className="w-full bg-sky-500 text-white px-14 py-5 rounded-full font-black uppercase text-xs tracking-[0.3em] hover:bg-sky-600 transition-all shadow-xl shadow-sky-100 active:scale-95 flex items-center justify-center gap-4 group disabled:bg-slate-200 mt-2"
               >
-                {loading ? <Loader2 className="animate-spin" size={22} /> : "Update Password"}
+                {loading ? (
+                  <Loader2 className="animate-spin" size={20} />
+                ) : (
+                  <>
+                    Update Password
+                    <CheckCircle2 size={20} className="group-hover:scale-110 transition-transform" />
+                  </>
+                )}
               </button>
             </form>
 
             <div className="mt-10 text-center">
-              <Link to="/login" className="inline-flex items-center gap-2 text-sky-600 font-black hover:text-slate-900 transition group underline-offset-8 hover:underline text-sm">
+              <Link to="/login" className="inline-flex items-center gap-2 text-sky-600 font-black hover:text-sky-400 transition group underline-offset-8 hover:underline text-sm">
                 <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
                 Back to Login
               </Link>
